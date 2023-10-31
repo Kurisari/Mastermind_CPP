@@ -53,7 +53,7 @@ bool verificarJugada(const vector<int>& patronSecreto, const vector<int>& jugada
     if (aciertos > 0) {
         cout << "Posiciones acertadas: ";
         for (int i = 0; i < aciertos; i++) {
-            cout << posicionesAciertos[i] << " ";
+            cout << posicionesAciertos[i]+1 << " ";
         }
         cout << endl;
     }
@@ -80,13 +80,13 @@ int main() {
         while (!verificarJugada(patronSecreto, jugadaComputadora)) {
             jugadaComputadora = generarPatronAleatorio(longitud, numColores);
         }
-        cout << "¡La computadora adivino el patron!" << endl;
+        cout << "La computadora adivino el patron!" << endl;
     } else if (modoJuego == 2) {
         vector<int> patronSecreto = generarPatronAleatorio(longitud, numColores);
         cout << "La computadora ha creado un patron secreto. Intenta adivinarlo." << endl;
         vector<int> jugadaUsuario;
         while (true) {
-            cout << "Ingresa tu jugada de " << longitud << " elementos usando números del 1 al " << numColores << endl;
+            cout << "Ingresa tu jugada de " << longitud << " elementos usando numeros del 1 al " << numColores << endl;
             jugadaUsuario.clear();
             for (int i = 0; i < longitud; i++) {
                 int color;
@@ -94,7 +94,7 @@ int main() {
                 jugadaUsuario.push_back(color);
             }
             if (verificarJugada(patronSecreto, jugadaUsuario)) {
-                cout << "¡Adivinaste el patron secreto!" << endl;
+                cout << "Adivinaste el patron secreto!" << endl;
                 break;
             } else {
                 cout << "Intentalo de nuevo." << endl;
