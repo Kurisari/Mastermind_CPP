@@ -24,44 +24,36 @@ vector<int> obtenerPosicionesAciertos(const vector<int>& patronSecreto, const ve
     return posicionesAciertos;
 }
 
-vector<int> obtenerNumerosCoincidencia(const vector<int>& patronSecreto, const vector<int>& jugada) {
-    vector<int> numerosCoincidencia;
-    for (int i = 0; i < patronSecreto.size(); i++) {
-        bool aciertoEnPosicion = false;
-        for (int j = 0; j < jugada.size(); j++) {
-            if (!aciertoEnPosicion && patronSecreto[i] == jugada[j]) {
-                aciertoEnPosicion = true;
-                break;
-            }
-        }
-        if (!aciertoEnPosicion) {
-            numerosCoincidencia.push_back(patronSecreto[i]);
-        }
-    }
-    return numerosCoincidencia;
-}
-
 bool verificarJugada(const vector<int>& patronSecreto, const vector<int>& jugada) {
     int longitud = patronSecreto.size();
     if (patronSecreto.size() != jugada.size()) {
         return false;
     }
     vector<int> posicionesAciertos = obtenerPosicionesAciertos(patronSecreto, jugada);
-    vector<int> numerosCoincidencia = obtenerNumerosCoincidencia(patronSecreto, jugada);
     int aciertos = posicionesAciertos.size();
-    int coincidencias = numerosCoincidencia.size();
+    int coincidencias = 0;
+    for (int i = 0; i < longitud; i++) {
+        bool aciertoEnPosicion = false;
+        for (int j = 0; j < posicionesAciertos.size(); j++) {
+            if (posicionesAciertos[j] == i) {
+                aciertoEnPosicion = true;
+                break;
+            }
+        }
+        if (!aciertoEnPosicion) {
+            for (int j = 0; j < longitud; j++) {
+                if (patronSecreto[i] == jugada[j]) {
+                    coincidencias++;
+                    break;
+                }
+            }
+        }
+    }
     cout << "Aciertos: " << aciertos << " Coincidencias: " << coincidencias << endl;
     if (aciertos > 0) {
         cout << "Posiciones acertadas: ";
         for (int i = 0; i < aciertos; i++) {
-            cout << posicionesAciertos[i] << " ";
-        }
-        cout << endl;
-    }
-    if (coincidencias > 0) {
-        cout << "Números que coinciden: ";
-        for (int i = 0; i < coincidencias; i++) {
-            cout << numerosCoincidencia[i] << " ";
+            cout << posicionesAciertos[i]+1 << " ";
         }
         cout << endl;
     }
@@ -87,6 +79,10 @@ int main() {
         vector<int> jugadaComputadora;
         while (!verificarJugada(patronSecreto, jugadaComputadora)) {
             jugadaComputadora = generarPatronAleatorio(longitud, numColores);
+            for (int i = 0; i < 4; i++) {
+            cout << jugadaComputadora[i] << " ";
+            }
+            cout << endl;
         }
         cout << "La computadora adivino el patron!" << endl;
     } else if (modoJuego == 2) {
