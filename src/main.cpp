@@ -53,7 +53,7 @@ bool verificarJugada(const vector<int>& patronSecreto, const vector<int>& jugada
     if (aciertos > 0) {
         cout << "Posiciones acertadas: ";
         for (int i = 0; i < aciertos; i++) {
-            cout << posicionesAciertos[i]+1 << " ";
+            cout << posicionesAciertos[i] + 1 << " ";
         }
         cout << endl;
     }
@@ -67,6 +67,7 @@ int main() {
     int modoJuego;
     cout << "Elige el modo de juego (1: Usuario crea, 2: Computadora crea): ";
     cin >> modoJuego;
+    int intentos = 0; // Contador de intentos
     if (modoJuego == 1) {
         vector<int> patronSecreto;
         cout << "Crea un patron secreto de " << longitud << " elementos usando numeros del 1 al " << numColores << endl;
@@ -77,19 +78,24 @@ int main() {
         }
         cout << "Patron secreto establecido. Ahora es turno de la computadora." << endl;
         vector<int> jugadaComputadora;
-        while (!verificarJugada(patronSecreto, jugadaComputadora)) {
+        while (!verificarJugada(patronSecreto, jugadaComputadora) && intentos < 10) {
             jugadaComputadora = generarPatronAleatorio(longitud, numColores);
-            for (int i = 0; i < 4; i++) {
-            cout << jugadaComputadora[i] << " ";
+            for (int i = 0; i < longitud; i++) {
+                cout << jugadaComputadora[i] << " ";
             }
             cout << endl;
+            intentos++;
         }
-        cout << "La computadora adivino el patron!" << endl;
+        if (intentos >= 10) {
+            cout << "La computadora no pudo adivinar el patron en 10 intentos." << endl;
+        } else {
+            cout << "La computadora adivino el patron!" << endl;
+        }
     } else if (modoJuego == 2) {
         vector<int> patronSecreto = generarPatronAleatorio(longitud, numColores);
         cout << "La computadora ha creado un patron secreto. Intenta adivinarlo." << endl;
         vector<int> jugadaUsuario;
-        while (true) {
+        while (!verificarJugada(patronSecreto, jugadaUsuario) && intentos < 10) {
             cout << "Ingresa tu jugada de " << longitud << " elementos usando numeros del 1 al " << numColores << endl;
             jugadaUsuario.clear();
             for (int i = 0; i < longitud; i++) {
@@ -103,6 +109,14 @@ int main() {
             } else {
                 cout << "Intentalo de nuevo." << endl;
             }
+            intentos++;
+        }
+        if (intentos >= 10) {
+            cout << "No pudiste adivinar el patron en 10 intentos. El patron secreto era: ";
+            for (int i = 0; i < longitud; i++) {
+                cout << patronSecreto[i] << " ";
+            }
+            cout << endl;
         }
     } else {
         cout << "Modo de juego no valido. Debe ser 1 o 2." << endl;
