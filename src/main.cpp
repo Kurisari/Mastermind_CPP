@@ -93,6 +93,7 @@ vector<int> adivinarPatron(const vector<int>& patronSecreto, int longitud, int n
     // Mientras no se haya adivinado el patrón, seguir haciendo intentos
     while (true) {
         // Mostrar el intento actual
+        cout << "Intento: " << intentos+1 << "/10" << endl;
         cout << "Intento de la computadora: ";
         for (int num : intento) {
             cout << num << " ";
@@ -141,7 +142,7 @@ int main() {
     if (modoJuego == 1) {
         // Modo en que el usuario crea el patrón y la computadora adivina
         vector<int> patronSecreto;
-        cout << "Crea un patron secreto de " << longitud << " elementos usando números del 1 al " << numColores << endl;
+        cout << "Crea un patron secreto de " << longitud << " elementos usando numeros del 1 al " << numColores << endl;
         for (int i = 0; i < longitud; i++) {
             int color;
             cin >> color;
@@ -151,9 +152,7 @@ int main() {
         vector<int> jugadaComputadora = adivinarPatron(patronSecreto, longitud, numColores);
         
         if (jugadaComputadora == patronSecreto) {
-            cout << "La computadora adivino el patrón." << endl;
-        } else {
-            cout << "La computadora no pudo adivinar el patrón." << endl;
+            cout << "La computadora adivino el patron." << endl;
         }
     } else if (modoJuego == 2) {
         bool continuar = true;
@@ -161,6 +160,7 @@ int main() {
         cout << "La computadora ha creado un patron secreto. Intenta adivinarlo." << endl;
         vector<int> jugadaUsuario;
         while (continuar && intentos < 10) {
+            cout << "Intento: " << intentos+1 << "/10" << endl;
             cout << "Ingresa tu jugada de " << longitud << " elementos usando numeros del 1 al " << numColores << endl;
             jugadaUsuario.clear();
             for (int i = 0; i < longitud; i++) {
