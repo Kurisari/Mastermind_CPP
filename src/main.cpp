@@ -25,12 +25,25 @@ vector<int> obtenerPosicionesAciertos(const vector<int>& patronSecreto, const ve
     return posicionesAciertos;
 }
 
+vector<int> obtenerPosicionesCoincidencias(const vector<int>& patronSecreto, const vector<int>& jugada){
+    vector<int> posicionesCoincidencias;
+    for (int i = 0; i < patronSecreto.size(); i++) {
+        for (int j = 0; j < jugada.size(); j++) {
+            if (patronSecreto[i] == jugada[j]) {
+                posicionesCoincidencias.push_back(i);
+            }
+        }
+    }
+    return posicionesCoincidencias;
+}
+
 bool verificarJugada(const vector<int>& patronSecreto, const vector<int>& jugada) {
     int longitud = patronSecreto.size();
     if (patronSecreto.size() != jugada.size()) {
         return false;
     }
     vector<int> posicionesAciertos = obtenerPosicionesAciertos(patronSecreto, jugada);
+    vector<int> posicionesCoincidencias = obtenerPosicionesCoincidencias(patronSecreto, jugada);
     int aciertos = posicionesAciertos.size();
     int coincidencias = 0;
     for (int i = 0; i < longitud; i++) {
@@ -55,6 +68,13 @@ bool verificarJugada(const vector<int>& patronSecreto, const vector<int>& jugada
         cout << "Posiciones acertadas: ";
         for (int i = 0; i < aciertos; i++) {
             cout << posicionesAciertos[i] + 1 << " ";
+        }
+        cout << endl;
+    }
+    if(coincidencias > 0) {
+        cout << "Posiciones coincidencias: ";
+        for (int i = 0; i < coincidencias; i++) {
+            cout << posicionesCoincidencias[i] + 1 << " ";
         }
         cout << endl;
     }
