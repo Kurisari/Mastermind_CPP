@@ -6,6 +6,10 @@
 
 using namespace std;
 
+bool in(vector<int> vec, int element) {
+    return find(vec.begin(), vec.end(), element) != vec.end();
+}
+
 // Función para generar un patrón aleatorio
 vector<int> generarPatronAleatorio(int longitud, int numColores) {
     vector<int> patron;
@@ -27,11 +31,9 @@ vector<int> obtenerPosicionesAciertos(const vector<int>& patronSecreto, const ve
 
 vector<int> obtenerPosicionesCoincidencias(const vector<int>& patronSecreto, const vector<int>& jugada){
     vector<int> posicionesCoincidencias;
-    for (int i = 0; i < patronSecreto.size(); i++) {
-        for (int j = 0; j < jugada.size(); j++) {
-            if (patronSecreto[i] == jugada[j]) {
-                posicionesCoincidencias.push_back(i);
-            }
+    for (int i = 0; i < jugada.size(); i++) {
+        if(in(patronSecreto, jugada[i])){
+            posicionesCoincidencias.push_back(i);
         }
     }
     return posicionesCoincidencias;
@@ -46,23 +48,12 @@ bool verificarJugada(const vector<int>& patronSecreto, const vector<int>& jugada
     vector<int> posicionesCoincidencias = obtenerPosicionesCoincidencias(patronSecreto, jugada);
     int aciertos = posicionesAciertos.size();
     int coincidencias = 0;
-    for (int i = 0; i < longitud; i++) {
-        bool aciertoEnPosicion = false;
-        for (int j = 0; j < posicionesAciertos.size(); j++) {
-            if (posicionesAciertos[j] == i) {
-                aciertoEnPosicion = true;
-                break;
-            }
-        }
-        if (!aciertoEnPosicion) {
-            for (int j = 0; j < longitud; j++) {
-                if (patronSecreto[i] == jugada[j]) {
-                    coincidencias++;
-                    break;
-                }
-            }
+    for (int i = 0; i < longitud; i++){
+        if(in(posicionesAciertos, posicionesCoincidencias[i])){
+            posicionesCoincidencias.erase(posicionesCoincidencias.begin()+i);
         }
     }
+    coincidencias = posicionesCoincidencias.size();
     cout << "Aciertos: " << aciertos << " Coincidencias: " << coincidencias << endl;
     if (aciertos > 0) {
         cout << "Posiciones acertadas: ";
