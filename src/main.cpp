@@ -2,6 +2,7 @@
 #include <vector>
 #include <ctime>
 #include <cstdlib>
+#include <algorithm>
 
 using namespace std;
 
@@ -60,6 +61,64 @@ bool verificarJugada(const vector<int>& patronSecreto, const vector<int>& jugada
     return aciertos == longitud;
 }
 
+// Función para evaluar la coincidencia entre dos vectores
+pair<int, int> evaluarCoincidencias(const vector<int>& patron, const vector<int>& intento) {
+    int coincidencias = 0;
+    int noCoincidencias = 0;
+    for (size_t i = 0; i < patron.size(); ++i) {
+        if (patron[i] == intento[i]) {
+            coincidencias++;
+        } else if (count(patron.begin(), patron.end(), intento[i]) > 0) {
+            noCoincidencias++;
+        }
+    }
+    return make_pair(coincidencias, noCoincidencias);
+}
+
+// Función para adivinar el patrón
+vector<int> adivinarPatron(const vector<int>& patronSecreto, int longitud, int numColores) {
+    vector<int> intento(longitud, 1);  // Comenzar con un intento inicial
+    int intentos = 0;  // Contador de intentos
+    // Mientras no se haya adivinado el patrón, seguir haciendo intentos
+    while (true) {
+        // Mostrar el intento actual
+        cout << "Intento de la computadora: ";
+        for (int num : intento) {
+            cout << num << " ";
+        }
+        cout << endl;
+        // Evaluar la coincidencia con el patrón
+        auto coincidencias = evaluarCoincidencias(patronSecreto, intento);
+        // Mostrar las coincidencias
+        cout << "Coincidencias: " << coincidencias.first << ", No coincidencias: " << coincidencias.second << endl;
+        // Si todas las posiciones coinciden, se ha adivinado el patrón
+        if (coincidencias.first == longitud) {
+            break;
+        }
+        // Generar un nuevo intento basado en las coincidencias y no coincidencias
+        for (size_t i = 0; i < intento.size(); ++i) {
+            if (coincidencias.first > 0) {
+                if (patronSecreto[i] == intento[i]) {
+                    // Coincidencia, mantener el número actual
+                } else {
+                    // No coincidencia, probar con un número diferente
+                    intento[i] = rand() % numColores + 1;
+                }
+            } else {
+                // No hay coincidencias, probar con un número diferente
+                intento[i] = rand() % numColores + 1;
+            }
+        }
+        intentos++;
+        // Limitar el número de intentos para evitar bucles infinitos
+        if (intentos >= 10) {
+            cout << "La computadora no pudo adivinar el patron en 10 intentos." << endl;
+            break;
+        }
+    }
+    return intento;
+}
+
 int main() {
     srand(time(0)); // Inicializar la semilla aleatoria
     int longitud = 4; // Longitud del patrón
@@ -69,33 +128,28 @@ int main() {
     cin >> modoJuego;
     int intentos = 0; // Contador de intentos
     if (modoJuego == 1) {
+        // Modo en que el usuario crea el patrón y la computadora adivina
         vector<int> patronSecreto;
-        cout << "Crea un patron secreto de " << longitud << " elementos usando numeros del 1 al " << numColores << endl;
+        cout << "Crea un patron secreto de " << longitud << " elementos usando números del 1 al " << numColores << endl;
         for (int i = 0; i < longitud; i++) {
             int color;
             cin >> color;
             patronSecreto.push_back(color);
         }
-        cout << "Patron secreto establecido. Ahora es turno de la computadora." << endl;
-        vector<int> jugadaComputadora;
-        while (!verificarJugada(patronSecreto, jugadaComputadora) && intentos < 10) {
-            jugadaComputadora = generarPatronAleatorio(longitud, numColores);
-            for (int i = 0; i < longitud; i++) {
-                cout << jugadaComputadora[i] << " ";
-            }
-            cout << endl;
-            intentos++;
-        }
-        if (intentos >= 10) {
-            cout << "La computadora no pudo adivinar el patron en 10 intentos." << endl;
+        cout << "Patron secreto establecido. Ahora es el turno de la computadora." << endl;
+        vector<int> jugadaComputadora = adivinarPatron(patronSecreto, longitud, numColores);
+        
+        if (jugadaComputadora == patronSecreto) {
+            cout << "La computadora adivino el patrón." << endl;
         } else {
-            cout << "La computadora adivino el patron!" << endl;
+            cout << "La computadora no pudo adivinar el patrón." << endl;
         }
     } else if (modoJuego == 2) {
+        bool continuar = true;
         vector<int> patronSecreto = generarPatronAleatorio(longitud, numColores);
         cout << "La computadora ha creado un patron secreto. Intenta adivinarlo." << endl;
         vector<int> jugadaUsuario;
-        while (!verificarJugada(patronSecreto, jugadaUsuario) && intentos < 10) {
+        while (continuar && intentos < 10) {
             cout << "Ingresa tu jugada de " << longitud << " elementos usando numeros del 1 al " << numColores << endl;
             jugadaUsuario.clear();
             for (int i = 0; i < longitud; i++) {
@@ -105,6 +159,7 @@ int main() {
             }
             if (verificarJugada(patronSecreto, jugadaUsuario)) {
                 cout << "Adivinaste el patron secreto!" << endl;
+                continuar = false;
                 break;
             } else {
                 cout << "Intentalo de nuevo." << endl;
