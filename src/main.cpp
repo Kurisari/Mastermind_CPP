@@ -19,6 +19,7 @@ vector<int> generarPatronAleatorio(int longitud, int numColores) {
     return patron;
 }
 
+// Función para obtener las posiciones donde se acertó
 vector<int> obtenerPosicionesAciertos(const vector<int>& patronSecreto, const vector<int>& jugada) {
     vector<int> posicionesAciertos;
     for (int i = 0; i < patronSecreto.size(); i++) {
@@ -29,6 +30,7 @@ vector<int> obtenerPosicionesAciertos(const vector<int>& patronSecreto, const ve
     return posicionesAciertos;
 }
 
+// Función para obtener las posiciones donde se coincidió pero no se acertó
 vector<int> obtenerPosicionesCoincidencias(const vector<int>& patronSecreto, const vector<int>& jugada){
     vector<int> posicionesCoincidencias;
     for (int i = 0; i < jugada.size(); i++) {
@@ -39,6 +41,7 @@ vector<int> obtenerPosicionesCoincidencias(const vector<int>& patronSecreto, con
     return posicionesCoincidencias;
 }
 
+// Función para verificar la jugada de la computadora
 bool verificarJugada(const vector<int>& patronSecreto, const vector<int>& jugada) {
     int longitud = patronSecreto.size();
     if (patronSecreto.size() != jugada.size()) {
@@ -149,6 +152,7 @@ int main() {
             patronSecreto.push_back(color);
         }
         cout << "Patron secreto establecido. Ahora es el turno de la computadora." << endl;
+        // Computadora comienza a adivinar
         vector<int> jugadaComputadora = adivinarPatron(patronSecreto, longitud, numColores);
         
         if (jugadaComputadora == patronSecreto) {
@@ -156,9 +160,11 @@ int main() {
         }
     } else if (modoJuego == 2) {
         bool continuar = true;
+        // La computadora crea un patrón aleatorio
         vector<int> patronSecreto = generarPatronAleatorio(longitud, numColores);
         cout << "La computadora ha creado un patron secreto. Intenta adivinarlo." << endl;
         vector<int> jugadaUsuario;
+        // Se comienza a ingresar el patrón por parte del usuario
         while (continuar && intentos < 10) {
             cout << "Intento: " << intentos+1 << "/10" << endl;
             cout << "Ingresa tu jugada de " << longitud << " elementos usando numeros del 1 al " << numColores << endl;
