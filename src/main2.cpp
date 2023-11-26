@@ -333,7 +333,6 @@ int main() {
                 // } else {
                 //     cout << "La computadora adivino tu codigo!.\n\n";
                 // }
-
                 // Adivinar el patrón usando la nueva función
                 MastermindJugada intentoAdivinado = jugadorPC.adivinarPatron(codigoUsuario);
                 cout << "La computadora adivino el patron: ";
