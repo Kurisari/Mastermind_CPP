@@ -131,7 +131,7 @@ public:
                 break;
             }
         }
-        return MastermindJugada(intento);  // Corrección aquí
+        return MastermindJugada(intento);
     }
 private:
     // Función para evaluar la coincidencia entre dos vectores
