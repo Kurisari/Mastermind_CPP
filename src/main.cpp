@@ -1,23 +1,18 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
 int longitudJuego = 4;
+ostringstream oss;
 
-// Arrays y cadenas: listo
-// Estructuras de control: listo
-// Funciones y sobrecarga: listo
-// Punteros y referencias: listo
-// Estructuras, uniones y enumeraciones: listo
-// POO, clases y objetos: listo
-// Sobrecarga de operadores: **** TODO
-// E/S de archivos y aleatorios: **** TODO
-// E/S con formato: **** TODO
-// Herencia y funciones virtuales: listo
-// Polimorfismo: listo
-// Funciones y variables estáticas **** TODO
+// Sobrecarga de operadores: ** TODO
+// E/S de archivos y aleatorios: ** TODO
+// E/S con formato: ** TODO
+// Funciones y variables estáticas ** TODO
 
 enum Color {
     ROJO = 1,
@@ -30,12 +25,10 @@ enum Color {
 
 struct MastermindJugada {
     int longitud;
-    vector<int> colores;
+    Color* colores;
 
-    MastermindJugada(int len) : longitud(len), colores(len) {}
-    MastermindJugada(const vector<int>& colores) : longitud(colores.size()), colores(colores) {}
+    MastermindJugada(int len) : longitud(len), colores(new Color[len]) {}
 };
-
 
 vector<int> posicionesCorrectas(MastermindJugada ultimaJugada, MastermindJugada codigoSecreto) {
     vector<int> correctPositions;
@@ -74,90 +67,57 @@ public:
 };
 
 class JugadorPC : public Jugador {
+    mutable MastermindJugada ultimaJugada;
+    mutable bool primerIntento;
+
 public:
-    JugadorPC(MastermindJugada codigoSecreto) : Jugador(codigoSecreto) {
+    JugadorPC(MastermindJugada codigoSecreto) : Jugador(codigoSecreto), ultimaJugada(longitudJuego) {
         this->codigoSecreto = codigoSecreto;
+        primerIntento = true;
     }
 
     MastermindJugada crearJugada() const override {
         MastermindJugada jugada(longitudJuego);
 
-        cout << "Computadora ingresa: ";
-        for (int i = 0; i < longitudJuego; ++i) {
-            jugada.colores[i] = static_cast<Color>(rand() % 6 + 1);
-            cout << jugada.colores[i] << " ";
-        }
-        cout << endl;
+        cout << "PC prueba con: ";
+        oss << "PC prueba con: ";
+        if (primerIntento) {
+            primerIntento = false;
+            srand(static_cast<unsigned>(time(nullptr)));
 
+            for (int i = 0; i < longitudJuego; ++i) {
+                jugada.colores[i] = static_cast<Color>(rand() % 6 + 1);
+                cout << jugada.colores[i] << " ";
+                oss << jugada.colores[i] << " ";
+            }
+        } else {
+            auto posicionesCorrectasAnteriores = posicionesCorrectas(ultimaJugada, codigoSecreto);
+            auto posicionesColoresAcertadosAnteriores = posicionesColoresAcertados(ultimaJugada, codigoSecreto);
+
+            for (int i = 0; i < longitudJuego; ++i) {
+                if (find(posicionesCorrectasAnteriores.begin(), posicionesCorrectasAnteriores.end(), i) != posicionesCorrectasAnteriores.end()) {
+                    jugada.colores[i] = ultimaJugada.colores[i];
+                } else if (find(posicionesColoresAcertadosAnteriores.begin(), posicionesColoresAcertadosAnteriores.end(), i) != posicionesColoresAcertadosAnteriores.end()) {
+                    jugada.colores[i] = static_cast<Color>(rand() % 6 + 1);
+                } else {
+                    jugada.colores[i] = static_cast<Color>(rand() % 6 + 1);
+                }
+                cout << jugada.colores[i] << " ";
+                oss << jugada.colores[i] << " ";
+            }
+        }
+        cout << "\n";
+        oss << "\n";
+
+        ultimaJugada = jugada;
         return jugada;
     }
-    MastermindJugada adivinarPatron(const MastermindJugada& patronSecreto) const {
-        vector<int> intento(longitudJuego, 1);  // Comenzar con un intento inicial
-        int intentos = 0;  // Contador de intentos
-        // Mientras no se haya adivinado el patrón, seguir haciendo intentos
-        while (true) {
-            // Mostrar el intento actual
-            cout << "Intento de la computadora: ";
-            for (int num : intento) {
-                cout << num << " ";
-            }
-            cout << endl;
-            // Evaluar la coincidencia con el patrón
-            auto coincidencias = evaluarCoincidencias(patronSecreto.colores, intento);
-            // Mostrar las coincidencias
-            cout << "Coincidencias: " << coincidencias.first << ", No coincidencias: " << coincidencias.second << endl;
-            // Si todas las posiciones coinciden, se ha adivinado el patrón
-            if (coincidencias.first == longitudJuego) {
-                break;
-            }
-            // Generar un nuevo intento basado en las coincidencias y no coincidencias
-            for (size_t i = 0; i < intento.size(); ++i) {
-                if (coincidencias.first > 0) {
-                    if (patronSecreto.colores[i] == intento[i]) {
-                        // Coincidencia, mantener el número actual
-                    } else {
-                        // No coincidencia, probar con un número diferente
-                        intento[i] = rand() % 6 + 1;
-                    }
-                } else {
-                    // No hay coincidencias, probar con un número diferente
-                    intento[i] = rand() % 6 + 1;
-                }
-            }
-            intentos++;
-            // Limitar el número de intentos para evitar bucles infinitos
-            if (intentos >= 10) {
-                cout << "La computadora no pudo adivinar el patron en 10 intentos." << endl;
-                break;
-            }
-        }
-        return MastermindJugada(intento);
-    }
-private:
-    // Función para evaluar la coincidencia entre dos vectores
-    pair<int, int> evaluarCoincidencias(const vector<int>& patron, const vector<int>& intento) const {
-        int coincidencias = 0;
-        int noCoincidencias = 0;
-        for (size_t i = 0; i < patron.size(); ++i) {
-            if (patron[i] == intento[i]) {
-                coincidencias++;
-            } else if (count(patron.begin(), patron.end(), intento[i]) > 0) {
-                noCoincidencias++;
-            }
-        }
-        return make_pair(coincidencias, noCoincidencias);
-    }
 };
-
-
 
 class JugadorUsuario : public Jugador {
 public:
     JugadorUsuario(MastermindJugada codigoSecreto) : Jugador(codigoSecreto) {
-        srand(static_cast<unsigned>(time(nullptr)));
-
-        for (int i = 0; i < longitudJuego; ++i)
-            codigoSecreto.colores[i] = static_cast<Color>(rand() % 6 + 1);
+        this->codigoSecreto = codigoSecreto;
     }
 
     MastermindJugada crearJugada() const override {
@@ -165,6 +125,7 @@ public:
 
         while(true) {
             cout << "Ingrese su jugada (por ejemplo, 1 1 2 3 para seleccionar colores): ";
+            oss << "Ingrese su jugada (por ejemplo, 1 1 2 3 para seleccionar colores): ";
 
             bool correcto = true;
 
@@ -175,13 +136,17 @@ public:
                 if (color < 1 || color > 6)
                     correcto = false;
 
+                if (color == 999)
+                    correcto = true;
+
                 jugada.colores[i] = static_cast<Color>(color);
             }
 
             if (correcto)
                 break;
 
-            cout << "Al menos un color no esta en el rango permitido (1-6)" << endl;
+            cout << "Al menos un color no esta en el rango permitido (1-6)\n";
+            oss << "Al menos un color no esta en el rango permitido (1-6)\n";
         }
 
         return jugada;
@@ -190,12 +155,13 @@ public:
 
 class MastermindJuego {
 private:
-    MastermindJugada codigoSecreto;
     MastermindJugada ultimaJugada;
     Jugador* jugadorActual;
     int intento = 1;
 
 public:
+    MastermindJugada codigoSecreto;
+
     MastermindJuego(Jugador* jugador) : jugadorActual(jugador), codigoSecreto(longitudJuego), ultimaJugada(longitudJuego) {
         codigoSecreto = jugador->getCodigoSecreto();
     }
@@ -205,7 +171,12 @@ public:
             return 1;
 
         cout << " ----------- " << "Intento " << intento << " ---------- " << endl;
+        oss << " ----------- " << "Intento " << intento << " ---------- " << endl;
         ultimaJugada = jugadorActual->crearJugada();
+
+        if (ultimaJugada.colores[0] == static_cast<Color>(999))
+            return 2;
+
         intento++;
         return 0;
     }
@@ -215,19 +186,27 @@ public:
         vector<int> coloresAcertados = posicionesColoresAcertados(ultimaJugada, codigoSecreto);
 
         if (posicionescorrectas.size() == 4) {
-            cout << "Ganaste! ";
+            cout << "Victoria! ";
+            oss << "Victoria! ";
             this->mostrarCodigoSecreto();
 
         } else {
             cout << "Hay " << posicionescorrectas.size() << " color(es) correcto(s) en: ";
-            for (int pos : posicionescorrectas)
-                cout << pos << " ";
+            oss << "Hay " << posicionescorrectas.size() << " color(es) correcto(s) en: ";
+            for (int pos : posicionescorrectas) {
+                cout << pos + 1 << " ";
+                oss << pos + 1 << " ";
+            }
 
             cout << "\nHay " << coloresAcertados.size() << " colores acertados en: ";
-            for (int col : coloresAcertados)
-                cout << col << " ";
+            oss << "\nHay " << coloresAcertados.size() << " colores acertados en: ";
+            for (int col : coloresAcertados) {
+                cout << col + 1 << " ";
+                oss << col + 1 << " ";
+            }
 
             cout << "\n\n";
+            oss << "\n\n";
         }
     }
 
@@ -236,12 +215,14 @@ public:
     }
 
     void mostrarCodigoSecreto() const {
-        for (int i = 0; i < codigoSecreto.longitud; i++)
-            cout << codigoSecreto.colores[i] << " ";
+        for (int i = 0; i < longitudJuego; i++) {
+            cout << jugadorActual->codigoSecreto.colores[i] << " ";
+            oss << jugadorActual->codigoSecreto.colores[i] << " ";
+        }
 
-        cout << "era el codigo correcto" << endl;
+        cout << "era el codigo correcto\n";
+        oss << "era el codigo correcto\n";
     }
-    
 };
 
 
@@ -262,27 +243,82 @@ int main() {
 
         switch(modoJuego) {
             case 1: {
-                JugadorUsuario humanPlayer(MastermindJugada(0));
+                cout << "Bienvenido a Mastermind. Intenta adivinar el codigo secreto.\n\n";
+                oss << "Bienvenido a Mastermind. Intenta adivinar el codigo secreto.\n\n";
+
+                MastermindJugada codigoPC(longitudJuego);
+                int opcionCodigo = 0;
+
+                while (opcionCodigo != 1 && opcionCodigo != 2) {
+                    cout << "PC crea un codigo aleatorio (1) / Usuario crea un codigo (2): ";
+                    oss << "PC crea un codigo aleatorio (1) / Usuario crea un codigo (2): ";
+                    cin >> opcionCodigo;
+
+                    switch(opcionCodigo) {
+                        case 1:
+                            srand(static_cast<unsigned>(time(nullptr)));
+
+                            for (int i = 0; i < longitudJuego; ++i)
+                                codigoPC.colores[i] = static_cast<Color>(rand() % 6 + 1);
+                            break;
+                        case 2:
+                            while(true) {
+                                cout << "Ingresa un codigo secreto (por ejemplo, 1 1 2 3). El usuario tratara de adivinarlo: ";
+                                oss << "Ingresa un codigo secreto (por ejemplo, 1 1 2 3). El usuario tratara de adivinarlo: ";
+                                bool correcto = true;
+
+                                for (int i = 0; i < longitudJuego; i++) {
+                                    int color;
+                                    cin >> color;
+
+                                    if (color < 1 || color > 6)
+                                        correcto = false;
+
+                                    codigoPC.colores[i] = static_cast<Color>(color);
+                                }
+
+                                if (correcto)
+                                    break;
+
+                                cout << "Al menos un color no esta en el rango permitido (1-6)\n";
+                                oss << "Al menos un color no esta en el rango permitido (1-6)\n";
+                            }
+                            cout << "\n";
+                            oss << "\n";
+
+                            break;
+                        default:
+                            cout << "Ingresa una opcion valida" << endl;
+                            break;
+                    }
+                }
+
+                cout << " > Ingresa (999) en la primera opcion para salir" << endl;
+
+                JugadorUsuario humanPlayer(codigoPC);
                 Jugador* jugador = &humanPlayer;
                 MastermindJuego juego(jugador);
                 int estado;
 
-                cout << "Bienvenido a Mastermind. Intenta adivinar el codigo secreto.\n\n";
-
                 while (!juego.isGameOver()) {
                     estado = juego.realizarJugada();
 
-                    if (estado == 1)
+                    if (estado == 1 || estado == 2)
                         break;
 
                     juego.evaluarJugada();
                 }
 
                 if (estado == 1) {
-                    cout << "No pudiste adivinar en menos de 10 intentos :(" << endl;
+                    cout << "No pudiste adivinar en menos de 10 intentos :(\n";
+                    oss << "No pudiste adivinar en menos de 10 intentos :(\n";
                     juego.mostrarCodigoSecreto();
-                } else {
+                    cout << endl;
+                    oss << endl;
+
+                } else if (estado == 0) {
                     cout << "Felicidades! Has adivinado el codigo secreto.\n\n";
+                    oss << "Felicidades! Has adivinado el codigo secreto.\n\n";
                 }
 
                 break;
@@ -291,8 +327,12 @@ int main() {
             case 2: {
                 MastermindJugada codigoUsuario(longitudJuego);
 
+                cout << "Bienvenido a Mastermind. La computadora adivinara el codigo secreto.\n\n";
+                oss << "Bienvenido a Mastermind. La computadora adivinara el codigo secreto.\n\n";
+
                 while(true) {
                     cout << "Ingresa un codigo secreto (por ejemplo, 1 1 2 3). La computadora tratara de adivinarlo: ";
+                    oss << "Ingresa un codigo secreto (por ejemplo, 1 1 2 3). La computadora tratara de adivinarlo: ";
                     bool correcto = true;
 
                     for (int i = 0; i < longitudJuego; i++) {
@@ -308,38 +348,36 @@ int main() {
                     if (correcto)
                         break;
 
-                    cout << "Al menos un color no esta en el rango permitido (1-6)" << endl;
+                    cout << "Al menos un color no esta en el rango permitido (1-6)\n";
+                    oss << "Al menos un color no esta en el rango permitido (1-6)\n";
                 }
-                cout << endl;
+                cout << "\n";
+                oss << "\n";
 
                 JugadorPC jugadorPC(codigoUsuario);
                 Jugador* jugador = &jugadorPC;
                 MastermindJuego juego(jugador);
-                // int estado;
+                int estado;
 
-                // while (!juego.isGameOver()) {
-                //     estado = juego.realizarJugada();
+                while (!juego.isGameOver()) {
+                    estado = juego.realizarJugada();
 
-                //     if (estado == 1)
-                //         break;
+                    if (estado == 1)
+                        break;
 
-                //     juego.evaluarJugada();
-                // }
-
-                // if (estado == 1) {
-                //     cout << "La computadora no pudo adivinar tu codigo secreto :(" << endl;
-                //     juego.mostrarCodigoSecreto();
-                //     cout << endl;
-                // } else {
-                //     cout << "La computadora adivino tu codigo!.\n\n";
-                // }
-                // Adivinar el patrón usando la nueva función
-                MastermindJugada intentoAdivinado = jugadorPC.adivinarPatron(codigoUsuario);
-                cout << "La computadora adivino el patron: ";
-                for (int num : intentoAdivinado.colores) {
-                    cout << num << " ";
+                    juego.evaluarJugada();
                 }
-                cout << endl;
+
+                if (estado == 1) {
+                    cout << "La computadora no pudo adivinar tu codigo secreto :(\n";
+                    oss << "La computadora no pudo adivinar tu codigo secreto :(\n";
+                    juego.mostrarCodigoSecreto();
+                    cout << endl;
+                    oss << endl;
+                } else {
+                    cout << "La computadora adivino tu codigo!\n\n";
+                    oss << "La computadora adivino tu codigo!\n\n";
+                }
                 break;
             }
 
@@ -349,7 +387,15 @@ int main() {
             }
 
             case 4: {
-                cout << "Archivo TXT" << endl;
+                cout << "Guardando en un archivo .txt ..." << endl;
+                string str = oss.str();
+                ofstream file("output.txt");
+                file << str;
+
+                cout << "Archivo guardado!" << endl;
+
+                oss.str("");
+                oss.clear();
                 break;
             }
 
