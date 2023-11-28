@@ -188,7 +188,7 @@ public:
         vector<int> coloresAcertados = posicionesColoresAcertados(ultimaJugada, codigoSecreto);
 
         if (posicionescorrectas.size() == 4) {
-            cout << "Victoria! ";
+            cout << "\nVictoria! ";
             oss << "Victoria! ";
             this->mostrarCodigoSecreto();
 
@@ -392,7 +392,22 @@ int main() {
             }
 
             case 3: {
-                cout << "Archivo binario" << endl;
+                cout << "Guardando en un archivo binario ..." << endl;
+                ofstream archivo("archivo.bin", ios::binary);
+                string str = oss.str();
+
+                // Escribe el tamaño del string en el archivo
+                size_t size = str.size();
+                archivo.write(reinterpret_cast<char*>(&size), sizeof(size));
+
+                // Escribe el string en el archivo
+                archivo.write(str.c_str(), str.size());
+
+                cout << "Archivo guardado!\n\n";
+
+                // Cierra el archivo
+                archivo.close();
+
                 break;
             }
 
@@ -402,10 +417,8 @@ int main() {
                 ofstream file("output.txt");
                 file << str;
 
-                cout << "Archivo guardado!" << endl;
+                cout << "Archivo guardado!\n\n";
 
-                oss.str("");
-                oss.clear();
                 break;
             }
 
