@@ -107,7 +107,7 @@ public:
             }
         }
         cout << "\n";
-        oss << "\n";
+        oss << "\n\n";
 
         ultimaJugada = jugada;
         return jugada;
@@ -132,6 +132,7 @@ public:
             for (int i = 0; i < longitudJuego; i++) {
                 int color;
                 cin >> color;
+                oss << color << " ";
 
                 if (color < 1 || color > 6)
                     correcto = false;
@@ -148,6 +149,7 @@ public:
             cout << "Al menos un color no esta en el rango permitido (1-6)\n";
             oss << "Al menos un color no esta en el rango permitido (1-6)\n";
         }
+        oss << endl;
 
         return jugada;
     }
@@ -243,6 +245,9 @@ int main() {
 
         switch(modoJuego) {
             case 1: {
+                oss.str("");
+                oss.clear();
+
                 cout << "Bienvenido a Mastermind. Intenta adivinar el codigo secreto.\n\n";
                 oss << "Bienvenido a Mastermind. Intenta adivinar el codigo secreto.\n\n";
 
@@ -253,6 +258,7 @@ int main() {
                     cout << "PC crea un codigo aleatorio (1) / Usuario crea un codigo (2): ";
                     oss << "PC crea un codigo aleatorio (1) / Usuario crea un codigo (2): ";
                     cin >> opcionCodigo;
+                    oss << opcionCodigo << endl;
 
                     switch(opcionCodigo) {
                         case 1:
@@ -270,6 +276,7 @@ int main() {
                                 for (int i = 0; i < longitudJuego; i++) {
                                     int color;
                                     cin >> color;
+                                    oss << color << " ";
 
                                     if (color < 1 || color > 6)
                                         correcto = false;
@@ -326,6 +333,8 @@ int main() {
 
             case 2: {
                 MastermindJugada codigoUsuario(longitudJuego);
+                oss.str("");
+                oss.clear();
 
                 cout << "Bienvenido a Mastermind. La computadora adivinara el codigo secreto.\n\n";
                 oss << "Bienvenido a Mastermind. La computadora adivinara el codigo secreto.\n\n";
@@ -338,6 +347,7 @@ int main() {
                     for (int i = 0; i < longitudJuego; i++) {
                         int color;
                         cin >> color;
+                        oss << color << " ";
 
                         if (color < 1 || color > 6)
                             correcto = false;
@@ -405,7 +415,7 @@ int main() {
             }
 
             default:
-                cout << "Opcion invalida. Ingresa una opcion del menu.";
+                cout << "Opcion invalida. Ingresa una opcion del menu." << endl;
                 break;
         }
 
