@@ -1,3 +1,14 @@
+/*
+Equipo 2:
+  Valeria Marian Andrade Monreal
+  Cristian Aragón Salazar
+  Luis Fernando De Anda De Loera
+  Jared López García
+  Christopher Oswaldo Márquez Reyes
+  César Omar Salazar Sánchez
+  Brian Samir Tiscareño Bisteni
+*/
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
